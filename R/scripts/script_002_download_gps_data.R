@@ -229,12 +229,13 @@ xy <- sp_africa %>%
   ) %>%
   # Coerce into a data.frame object (can't be a tibble!!!)
   as.data.frame(.)
+head(xy)
 
 # Retain only 1 GPS record per grid cell
 set.seed(2012)
 sp_africa_thin <- dismo::gridSample(
   xy = xy,     # Data.frame containing lon/lat columns only 
-  r = r ,      # Environmental rasters (must be a raster, not spatRast object)
+  r = r ,      # Environmental raster (must be a raster, not spatRast object)
   n = 1        # Number of records to keep per cell
 )
 
