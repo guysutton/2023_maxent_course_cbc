@@ -93,12 +93,18 @@ theme_opts <- list(
 #   'terra' R package 
 
 # -------- Uncomment this code to download WORLDCLIM layers -----------
-# wc_current <- geodata::worldclim_global(
-#   var = "bio", 
-#   res = 2.5,      # Minute degree resolution of raster layers 
-#   path = here::here("./data/environmental_layers/current/"), 
-#   version = "2.1"
-#   )
+
+# Create a directory to store climate data
+dir.create("./data/environmental_layers/current",
+           recursive = TRUE)
+
+# Download climate layers 
+wc_current <- geodata::worldclim_global(
+  var = "bio",
+  res = 2.5,      # Minute degree resolution of raster layers
+  path = here::here("./data/environmental_layers/current/"),
+  version = "2.1"
+  )
 
 # Load the WORLDCLIM rasters layers we already have downloaded 
 # - We don't need to run the download code above each new R session 
