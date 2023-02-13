@@ -16,7 +16,6 @@ pacman::p_load(
   Hmisc,
   patchwork,
   ecospat,
-  # kuenm,
   gridSVG,
   gridExtra,
   grid,
@@ -38,7 +37,6 @@ pacman::p_load(
   ecospat,
   rnaturalearth,
   rnaturalearthdata,
-  # megaSDM,
   InformationValue,
   caret, 
   terra,
@@ -94,38 +92,37 @@ theme_opts <- list(
 
 # -------- Uncomment this code to download WORLDCLIM layers -----------
 
-# Create a directory to store climate data
-dir.create("./data/environmental_layers/current",
-           recursive = TRUE)
-
-# Download climate layers 
-wc_current <- geodata::worldclim_global(
-  var = "bio",
-  res = 2.5,      # Minute degree resolution of raster layers
-  path = here::here("./data/environmental_layers/current/"),
-  version = "2.1"
-  )
-
-# Load the WORLDCLIM rasters layers we already have downloaded 
-# - We don't need to run the download code above each new R session 
-predictors <- terra::rast(list.files(
-      here::here("./data/environmental_layers/current/wc2.1_2.5m/"),
-      full.names = TRUE,
-      pattern = '.tif'
-    ))
-
+# # Create a directory to store climate data
+# dir.create("./data/environmental_layers/current",
+#            recursive = TRUE)
+# 
+# # Download climate layers 
+# wc_current <- geodata::worldclim_global(
+#   var = "bio",
+#   res = 2.5,      # Minute degree resolution of raster layers
+#   path = here::here("./data/environmental_layers/current/"),
+#   version = "2.1"
+#   )
+# 
+# Load the WORLDCLIM rasters layers we already have downloaded
+# - We don't need to run the download code above each new R session
+pred_climate <- terra::rast(list.files(
+  here::here("./data/environmental_layers/current/wc2.1_2.5m/"),
+  full.names = TRUE,
+  pattern = '.tif'
+))
 
 # Plot each of the 19 WORLDCLIM layers to check they imported correctly 
-terra::plot(predictors)
+terra::plot(pred_climate)
 
 # Plot the first layer only (bio1)
 # - 'bio1' is mean annual temperature 
-terra::plot(predictors[[1]])
+terra::plot(pred_climate[[1]])
 
 # Set the CRS projection for the current climate layers 
 # - Use the correct wkt CRS format - no more PROJ4 strings! 
-terra::crs(predictors) <- "epsg:4326"
-terra::crs(predictors, describe = T)
+terra::crs(pred_climate) <- "epsg:4326"
+terra::crs(pred_climate, describe = T)
 
 # -----------------------------------------------------------------------------
 # Download topographical raster layers 
@@ -139,18 +136,30 @@ terra::crs(predictors, describe = T)
 # For example, we can download quantitative or qualitative data for 
 # other topographical variables
 
+# # Create a directory to store climate data
+dir.create("./data/topographical_layers/current",
+           recursive = TRUE)
+
 ###################################
 # - Download total nitrogen in soil 
 ###################################
 
 # Download total nitrogen (N) in the soil
 # - We set the depth at 5cm into the soil
-pred_totaln <- geodata::soil_world(
-  var = "nitrogen", # Which variable do we want? 
-  depth = 5,        # Soil depth (cm)
-  stat = "mean",    # Return mean values (could get variance, CI's, ect...)
-  path = here::here("./data/topographical_layers/current/")
-  )
+# pred_totaln <- geodata::soil_world(
+#   var = "nitrogen",
+#   # Which variable do we want?
+#   depth = 5,
+#   # Soil depth (cm)
+#   stat = "mean",
+#   # Return mean values (could get variance, CI's, ect...)
+#   path = here::here("./data/topographical_layers/current/")
+# )
+
+# Load the totaln layer (if already downloaded)
+pred_totaln <- terra::rast(x = here::here(
+  "./data/topographical_layers/current/nitrogen_0-5cm_mean_30s.tif"
+))
 
 # Set the CRS projection for the total N layer
 terra::crs(pred_totaln) <- "epsg:4326"
@@ -159,17 +168,20 @@ terra::crs(pred_totaln, describe = T)
 # Plot 'Total Nitrogen' raster layer
 terra::plot(pred_totaln)
 
-
-
 ###################################
 # - Download grassland cover ------ 
 ###################################
 
 # Download grassland cover 
-pred_grass <- geodata::landcover(
-  var = "grassland", # Which variable do we want? 
-  path = here::here("./data/topographical_layers/current/")
-)
+# pred_grass <- geodata::landcover(
+#   var = "grassland", # Which variable do we want? 
+#   path = here::here("./data/topographical_layers/current/")
+# )
+
+# Load the grassland layer (if already downloaded)
+pred_grass <- terra::rast(x = here::here(
+  "./data/topographical_layers/current/WorldCover_grassland_30s.tif"
+))
 
 # Set the CRS projection for the grassland cover layer
 terra::crs(pred_grass) <- "epsg:4326"
@@ -177,3 +189,93 @@ terra::crs(pred_grass, describe = T)
 
 # Plot 'grassland cover' raster layer
 terra::plot(pred_grass)
+
+# -----------------------------------------------------------------------------
+# Combine all climate and topographic rasters into one variable 
+# -----------------------------------------------------------------------------
+
+# Check if all the rasters are in the same spatial resolution
+# - We downloaded climate at 2.5 minute resolution and topographical
+#   layers at 0.5 minute (30 second) resolution 
+terra::res(pred_climate)
+terra::res(pred_totaln)
+terra::res(pred_grass)
+
+# Convert resolutions to 2.5 minute
+# - Why? 
+pred_totaln <- terra::aggregate(pred_totaln, 5, mean)
+pred_totaln <- terra::resample(pred_totaln, pred_climate)
+terra::plot(pred_totaln)
+
+pred_grass <- terra::aggregate(pred_grass, 5, mean)
+pred_grass <- terra::resample(pred_grass, pred_climate)
+terra::plot(pred_grass)
+
+# Check if all the rasters are in the same resolution
+terra::res(pred_climate)
+terra::res(pred_totaln)
+terra::res(pred_grass)
+
+# Combine rasters into a single variable 
+# - We have to store the rasters in a list first and then
+#   pass the list to get rasterised 
+raster_list <- list(
+  pred_climate,
+  pred_totaln,
+  pred_grass
+  )
+predictors <- terra::rast(raster_list) 
+
+# Check the variable contains all 21 variables 
+terra::nlyr(predictors)
+terra::plot(predictors)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Combine raster layers into a new object called 'predictors'
+predictors <-
+  c(
+    # List of the rasters to combine
+    pred_clim, 
+    pred_totaln,
+    pred_grass
+  )
+
+# Check the extents of the different rasters layers 
+ext(pred_climate)
+ext(pred_totaln)
+ext(pred_grass)
+
+# We need to set the extent of each raster to be equal
+ext(pred_climate) <- c(-180, 180, -60, 90)
+ext(pred_totaln) <- c(-180, 180, -60, 90)
+ext(pred_grass) <- c(-180, 180, -60, 90)
+
+# Check the extents of the different rasters layers again
+ext(pred_climate)
+ext(pred_totaln)
+ext(pred_grass)
+
+
+# Combine raster layers into a new object called 'predictors'
+predictors <-
+  c(
+    # List of the rasters to combine
+    pred_clim, 
+    pred_totaln,
+    pred_grass
+  )
+
+
