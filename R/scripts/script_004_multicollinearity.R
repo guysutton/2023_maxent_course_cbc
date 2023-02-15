@@ -83,7 +83,7 @@ theme_opts <- list(
 
 
 # -----------------------------------------------------------------------------
-# Extract climate values at focal taxon GPS points 
+# Extract climate and topographical values at focal taxon GPS points 
 # -----------------------------------------------------------------------------
 
 # Focal taxon points are stored in `sp_africa`
@@ -96,9 +96,13 @@ head(sp_gps)
 
 # Extract climate at these points 
 clim_sp <- terra::extract(
-  x = predictors,          # SpatRast containing WORLDCLIM layers
+  x = predictors,          # SpatRast containing climate and topo layers
   y = sp_gps               # SpatVect or data.frame containing GPS of study taxon (lon, lat)
-  )
+  ) %>%
+  # Remove rows where no climate or topo data is available 
+  tidyr::drop_na() %>%
+  # Clean the column headers 
+  janitor::clean_names()
 head(clim_sp)
 
 # -----------------------------------------------------------------------------
@@ -119,14 +123,16 @@ var_step
 
 # Subset predictors to the set of uncorrelated predictors identified above 
 reduced_pred <- terra::subset(
-  x = predictors,               # SpatRast containing WORLDCLIM layers 
-  subset = c(                   # Provide names of layers in WORLDCLIM variable to keep
+  x = predictors,               # SpatRast containing WORLDCLIM/topo layers 
+  subset = c(                   # Provide names of predictors to keep
     "wc2.1_2.5m_bio_12",
     "wc2.1_2.5m_bio_15",
     "wc2.1_2.5m_bio_3",
     "wc2.1_2.5m_bio_4",
     "wc2.1_2.5m_bio_8",
-    "wc2.1_2.5m_bio_9"
+    "wc2.1_2.5m_bio_9",
+    "nitrogen_0-5cm",
+    "grassland"
     )
 )
 
