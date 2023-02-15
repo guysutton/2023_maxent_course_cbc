@@ -103,14 +103,17 @@ theme_opts <- list(
 #   path = here::here("./data/environmental_layers/current/"),
 #   version = "2.1"
 #   )
-# 
+
+# ----------------------------------------------------------------------
+
 # Load the WORLDCLIM rasters layers we already have downloaded
 # - We don't need to run the download code above each new R session
 pred_climate <- terra::rast(list.files(
   here::here("./data/environmental_layers/current/wc2.1_2.5m/"),
   full.names = TRUE,
   pattern = '.tif'
-))
+  )
+)
 
 # Plot each of the 19 WORLDCLIM layers to check they imported correctly 
 terra::plot(pred_climate)
@@ -159,7 +162,8 @@ dir.create("./data/topographical_layers/current",
 # Load the totaln layer (if already downloaded)
 pred_totaln <- terra::rast(x = here::here(
   "./data/topographical_layers/current/nitrogen_0-5cm_mean_30s.tif"
-))
+  )
+)
 
 # Set the CRS projection for the total N layer
 terra::crs(pred_totaln) <- "epsg:4326"
@@ -181,7 +185,8 @@ terra::plot(pred_totaln)
 # Load the grassland layer (if already downloaded)
 pred_grass <- terra::rast(x = here::here(
   "./data/topographical_layers/current/WorldCover_grassland_30s.tif"
-))
+  )
+)
 
 # Set the CRS projection for the grassland cover layer
 terra::crs(pred_grass) <- "epsg:4326"
