@@ -213,7 +213,7 @@ ggplot() +
 # - For now, we need to thin the GPS records to keep only 1 GPS point per 
 #   raster cell
 # - SDM's trained on spatially biased GPS data may misrepresent the relationships 
-#   between enviromental predictors and species distributions 
+#   between environmental predictors and species distributions 
 # - These models may better capture the structure of spatial sampling biases in the data
 #   than species distributions 
 # - More on this later...
