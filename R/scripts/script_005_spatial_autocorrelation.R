@@ -130,15 +130,15 @@ head(gps_spatial)
 # - Here, we are going to remove any points that are less than 1km apart 
 set.seed(2012)
 speciesThinned <- spThin::thin(
-  loc.data = gps_spatial,      # Data.frame of lon/lat (and can have species names)
-  lat.col = "y",         # Name of latitude column in `loc.data`
-  long.col = "x",        # Name of longitude column in `loc.data`
+  loc.data = gps_spatial,  # Data.frame of lon/lat (and can have species names)
+  lat.col = "y",           # Name of latitude column in `loc.data`
+  long.col = "x",          # Name of longitude column in `loc.data`
   spec.col = "species",    # Name of species column in `loc.data`
   thin.par = 1,            # Remove points up to 1km apart 
   reps = 100,              # Number of times to repeat thinning (don't edit)
   max.files = 1,           # Number of CSV files to produce (don't edit)
-  out.base = "gps_thinned_senecio_madagascariensis",
-  out.dir = here::here("./data/gps/spatial_thin/")
+  out.base = "gps_thinned_senecio_madagascariensis",  # Name of .csv file
+  out.dir = here::here("./data/gps/spatial_thin/")    # Where to store .csv file
 )
 
 # # Import the thinned GPS records
