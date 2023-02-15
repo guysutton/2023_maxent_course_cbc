@@ -141,18 +141,18 @@ speciesThinned <- spThin::thin(
   out.dir = here::here("./data/gps/spatial_thin/")    # Where to store .csv file
 )
 
-# # Import the thinned GPS records
-species <-
+# Import the thinned GPS records
+sp_gps <-
   readr::read_csv(
     here::here(
       "./data/gps/spatial_thin/gps_thinned_senecio_madagascariensis_thin1.csv"
       )
     )
-head(species)
+head(sp_gps)
 
 # # How many records were removed?
 nrow(gps_spatial)   # No. of records before spatial thinning 
-nrow(species)       # No. of records after spatial thinning 
+nrow(sp_gps)        # No. of records after spatial thinning 
 
 
 
