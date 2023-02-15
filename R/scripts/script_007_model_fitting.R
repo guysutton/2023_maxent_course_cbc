@@ -46,7 +46,6 @@ pacman::p_load(
   usdm
 )
 
-
 # Change ggplot theme
 theme_set(
   theme_classic() +
@@ -85,21 +84,18 @@ theme_opts <- list(
 # Setup data to fit MaxEnt models 
 # -----------------------------------------------------------------------------
 
-
-
-# We need a data.frame with columns containing climate data for each study species
-# GPS point 
+# We need a data.frame with columns containing climate and topo data for 
+# the study species GPS points 
 clim_species <- terra::extract(
-  x = reduced_pred,          # SpatRast containing reduced WORLDCLIM layers
-  y = sp_gps,                # SpatVect or data.frame containing GPS of background points (lon, lat)
-  xy = FALSE                 # Don't need lon and lat columns for each GPS point 
+  x = reduced_pred,     # SpatRast containing reduced clim and topo layers
+  y = sp_gps,           # SpatVect or data.frame containing GPS of background points (lon, lat)
+  xy = FALSE            # Don't need lon and lat columns for each GPS point 
 )
 head(clim_species)
   
-
 # We need a data.frame with columns containing climate data for each background point
 clim_bg <- terra::extract(
-  x = reduced_pred,          # SpatRast containing reduced WORLDCLIM layers
+  x = reduced_pred,          # SpatRast containing reduced clim and topo layers
   y = bg_pts,                # SpatVect or data.frame containing GPS of background points (lon, lat)
   xy = FALSE                 # Don't need lon and lat columns for each GPS point 
 )
@@ -131,12 +127,16 @@ mod1 <- dismo::maxent(
   path = here::here("./models/optimal_model_senecio_madgascariensis"),
   replicates = 10,
   args = c(
-    'betamultiplier=1.0',
-    'linear=true',
+    # Insert the optimal RM value here
+    'betamultiplier=2.0',
+    # Turn these on/off to change FC combinations 
+    # - To only use quadratic features, turn all to false except quadratic
+    'linear=false',
     'quadratic=true',
-    'product=true',
+    'product=false',
     'threshold=false',
-    'hinge=true',
+    'hinge=false',
+    # Don't change anything from here down 
     'threads=2',
     #'doclamp=true',
     'fadebyclamping=true',
@@ -156,17 +156,119 @@ mod1 <- dismo::maxent(
 
 # Get map of Australia to project our model over
 aus_ext <- rnaturalearth::ne_countries(scale = "medium",
-                                     returnclass = "sf") %>%
+                                       returnclass = "sf") %>%
   dplyr::filter(name == "Australia")
 
 # Mask reduced set of WORLDCLIM layers to the extent of Australia
 aus_map <- terra::mask(reduced_pred, aus_ext)
+terra::plot(aus_map)
 
 # Extract MaxEnt predictions for Australia 
 predict_maxent <- terra::predict(mod1, aus_map)
 terra::plot(predict_maxent)
+class(predict_maxent)
 
-# MaxEnt scores are in a raster layer above, but we need the MaxEnt scores in a dataframe 
+# Plot publication-quality figure   
+ggplot() +
+  # Plot Australia boundary
+  geom_sf(data = aus_ext, fill = NA) +
+  # Plot MaxEnt prediction raster
+  geom_spatraster(
+    data = predict_maxent,
+    maxcell = 5e+7         # maxcell = Inf
+    ) +
+  # Control raster colour and legend
+  scale_fill_whitebox_c(
+    palette = "muted",
+    breaks = seq(0, 1, 0.2),
+    limits = c(0, 1)
+    ) +
+  # Control axis and legend labels 
+  labs(
+    x = "Longitude",
+    y = "Latitude",
+    fill = "P(suitability)"
+    ) +
+  # Crops map to just the geographic extent of Australia
+  coord_sf(
+    xlim = c(110, 155),
+    ylim = c(-45, -8),
+    crs = 4326,
+    expand = FALSE
+    ) +
+  # Create title for the legend
+  theme(legend.position = "right") +
+  # Add scale bar to bottom-right of map
+  annotation_scale(
+    location = "bl",          # 'bl' = bottom left
+    style = "ticks",
+    width_hint = 0.2
+  ) +
+  # Add north arrow
+  annotation_north_arrow(
+    location = "bl",
+    which_north = "true",
+    pad_x = unit(0.175, "in"),
+    pad_y = unit(0.3, "in"),
+    style = north_arrow_fancy_orienteering
+  ) +
+  # Change appearance of the legend
+  guides(
+    fill = guide_colorbar(ticks = FALSE)
+  )
+
+# Save figure to PC
+ggsave(
+  "./models/optimal_model_senecio_madagascariensis/maxent_prediction.png",
+  dpi = 600,
+  height = 6,
+  width = 6
+)
+
+
+
+
+
+
+
+
+
+# -----------------------------------------------------------------------------
+# Don't RUN!!! 
+# -----------------------------------------------------------------------------
+
+
+# Get map of Australia to project our model over
+aus_ext <- rnaturalearth::ne_countries(scale = "medium",
+                                     returnclass = "sf") %>%
+  dplyr::filter(name %in% c("Australia"))
+
+# Convert Australia extent to a 'spatRast' object 
+aus_ext <- raster::raster(aus_ext)
+
+# Check extent of Australia map 
+terra::ext(aus_ext)
+
+# Store reduced predictors in a new variable 
+# called 'pred_ext' and check extent 
+pred_ext <- reduced_pred
+terra::ext(pred_ext)
+terra::ext(aus_ext) == terra::ext(pred_ext)
+
+# Convert predictor extent = Australia map extent 
+terra::ext(pred_ext) <- terra::ext(aus_ext)
+terra::ext(pred_ext)
+terra::ext(aus_ext) == terra::ext(pred_ext)
+
+# # Mask reduced set of WORLDCLIM layers to the extent of Australia
+aus_map <- terra::mask(pred_ext, aus_ext)
+
+# Extract MaxEnt predictions for Australia 
+predict_maxent <- terra::predict(mod1, pred_ext)
+terra::plot(predict_maxent)
+
+# MaxEnt scores are in a raster layer above, 
+# but we need the MaxEnt scores in a data.frame 
 # - Below, create data.frame of MaxEnt model projection/scores
 df <- terra::as.data.frame(predict_maxent, xy = TRUE) %>%
   dplyr::select(

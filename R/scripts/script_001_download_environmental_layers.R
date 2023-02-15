@@ -40,6 +40,7 @@ pacman::p_load(
   InformationValue,
   caret, 
   terra,
+  tidyterra,
   geodata,
   usdm
 )
@@ -116,7 +117,7 @@ pred_climate <- terra::rast(list.files(
 )
 
 # Plot each of the 19 WORLDCLIM layers to check they imported correctly 
-terra::plot(pred_climate)
+# terra::plot(pred_climate)
 
 # Plot the first layer only (bio1)
 # - 'bio1' is mean annual temperature 
