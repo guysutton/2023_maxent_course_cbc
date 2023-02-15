@@ -87,12 +87,13 @@ theme_opts <- list(
 # -----------------------------------------------------------------------------
 
 # Load KG layer
-kg_layer <- rgdal::readOGR(here::here("./data/shapefiles/koppen_geiger"), 
-                      "WC05_1975H_Koppen", 
-                      verbose = FALSE)
+kg_layer <- rgdal::readOGR(
+  here::here("./data/shapefiles/koppen_geiger"), 
+  "WC05_1975H_Koppen", 
+  verbose = FALSE
+  )
 
-
-# Reproject KG-layer
+# Re-project KG-layer
 geo_proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 kg_layer <- sp::spTransform(kg_layer, geo_proj)
 
@@ -137,9 +138,10 @@ points(sp_africa$lon,
        bg = 'mediumseagreen', 
        cex = 1)
 
-# Define background area by masking WORLDCLIM layers to just the KG zones with at 
-# least 1 GPS record
-# - First, we have to convert the KG zones containing GPS records back into an 'sf' object
+# Define background area by masking climate and topographic raster layers 
+# to just the KG zones with at least 1 GPS record
+# - First, we have to convert the KG zones containing GPS records 
+#   back into an 'sf' object
 kg_contain <- sf::st_as_sf(kg_contain)
 bg_area <- terra::mask(predictors, kg_contain)  
 
