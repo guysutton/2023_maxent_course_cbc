@@ -87,7 +87,7 @@ theme_opts <- list(
 
 # Extract climate data at focal taxon study points 
 gps_climate <- terra::extract(
-    x = reduced_pred,          # SpatRast containing reduced WORLDCLIM layers
+    x = reduced_pred,          # SpatRast containing reduced clim and topo layers
     y = sp_gps,                # SpatVect or data.frame containing GPS of study taxon (lon, lat)
     xy = TRUE                  # Return lon and lat columns for each GPS point 
   )
@@ -104,44 +104,56 @@ head(gps_climate)
 #     Vegetation, 80, 107-138.
 spatial_corr <- ecospat::ecospat.mantel.correlogram(
   dfvar = gps_climate,       # Data frame with environmental variables
-  colxy = 7:8,               # Columns containing lat/long
+  colxy = 10:11,             # Columns containing lat/long
   n = 500,                   # Number of random occurrences
-  colvar = 1:6,              # Columns containing climate variables
+  colvar = 2:9,              # Columns containing climate variables
   max = 30000,               # Computes autocorrelation up to 30km (30000m)
-  nclass = 30,               # How many points to compute correlation at 
+  nclass = 30,               # How many points to compute correlation at (n = 30)
   nperm = 100
 )
 plot(spatial_corr)
 
-# The first white dot represents 1km (1000m), and shows that there is no spatial autocorrelation
-# at this small distance between points. 
-# - Nothing to worry about here 
+# The first black dot represents 1km (1000m), and shows that there is 
+# significnat spatial autocorrelation at this small distance between points. 
+# - The white dots indicate no significant spatial autocorrelation when
+#   points are more than 1km apart. 
 
+# Before we spatially thin GPS records, we need to process the data
+# - We need to add a column giving the species name and remove the 
+#   ID column (which would otherwise be treated as a climate layer)
+gps_spatial <- gps_climate %>%
+  dplyr::select(-c(ID)) %>%
+  dplyr::mutate(species = "Senecio madagascariensis")
+head(gps_spatial)
 
 # Thin by spatial autocorrelation value
-#speciesThinned <- spThin::thin(
-#  loc.data = species,
-#  lat.col = "lat",
-#  long.col = "lon",
-#  spec.col = "species",
-#  # Km unit of correlogram
-#  thin.par = 0.2,
-#  reps = 100,
-#  max.files = 1,
-#  out.dir = here::here("./data/data_clean/")
-#)
+# - Here, we are going to remove any points that are less than 1km apart 
+set.seed(2012)
+speciesThinned <- spThin::thin(
+  loc.data = gps_spatial,      # Data.frame of lon/lat (and can have species names)
+  lat.col = "y",         # Name of latitude column in `loc.data`
+  long.col = "x",        # Name of longitude column in `loc.data`
+  spec.col = "species",    # Name of species column in `loc.data`
+  thin.par = 1,            # Remove points up to 1km apart 
+  reps = 100,              # Number of times to repeat thinning (don't edit)
+  max.files = 1,           # Number of CSV files to produce (don't edit)
+  out.base = "gps_thinned_senecio_madagascariensis",
+  out.dir = here::here("./data/gps/spatial_thin/")
+)
 
 # # Import the thinned GPS records
-# speciesThinned <-
-#   readr::read_csv(here::here("./data/data_clean/dasi_rubi_native_thinned.csv"))
-# head(speciesThinned)
-# 
+species <-
+  readr::read_csv(
+    here::here(
+      "./data/gps/spatial_thin/gps_thinned_senecio_madagascariensis_thin1.csv"
+      )
+    )
+head(species)
+
 # # How many records were removed?
-# nrow(species)
-# nrow(speciesThinned)
-# 
-# # Just for ease, make species_thinned = species
-# species <- speciesThinned
+nrow(gps_spatial)   # No. of records before spatial thinning 
+nrow(species)       # No. of records after spatial thinning 
+
 
 
 

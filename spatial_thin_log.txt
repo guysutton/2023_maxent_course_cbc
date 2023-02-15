@@ -1,0 +1,65 @@
+********************************************** 
+ Beginning Spatial Thinning.
+ Script Started at: Wed Feb 15 11:41:53 2023
+********************************************** 
+ Beginning Spatial Thinning.
+ Script Started at: Wed Feb 15 11:44:31 2023
+
+Thinning Parameter Used (in km): 1
+Number of replicates of thinning script: 100
+
+Elapsed time for thinning completion
+0.06 0 0.13 NA NA
+
+Number of data.frames per locations retained
+loc.cnt df.freq
+136
+100
+Maximum number of records after thinning: 136
+Number of data.frames with max records: 100
+
+**New *.csv file creation:**
+Writing new *.csv files to output directory: C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin
+Writing file: C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin/gps_thinned_senecio_madagascariensis_thin1.csv
+********************************************** 
+ Beginning Spatial Thinning.
+ Script Started at: Wed Feb 15 11:46:21 2023
+
+Thinning Parameter Used (in km): 1
+Number of replicates of thinning script: 100
+
+Elapsed time for thinning completion
+0.03 0 0.11 NA NA
+
+Number of data.frames per locations retained
+loc.cnt df.freq
+136
+100
+Maximum number of records after thinning: 136
+Number of data.frames with max records: 100
+
+**New *.csv file creation:**
+Writing new *.csv files to output directory: C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin
+C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin/gps_thinned_senecio_madagascariensis_thin1_new.csv ' already exists. Renaming file 
+                                   to avoid overwriting.
+Writing file: C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin/gps_thinned_senecio_madagascariensis_thin1_new.csv
+********************************************** 
+ Beginning Spatial Thinning.
+ Script Started at: Wed Feb 15 11:46:39 2023
+
+Thinning Parameter Used (in km): 1
+Number of replicates of thinning script: 100
+
+Elapsed time for thinning completion
+0.01 0 0.1 NA NA
+
+Number of data.frames per locations retained
+loc.cnt df.freq
+136
+100
+Maximum number of records after thinning: 136
+Number of data.frames with max records: 100
+
+**New *.csv file creation:**
+Writing new *.csv files to output directory: C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin
+Writing file: C:/Users/s1900332/OneDrive - Rhodes University/Statistics/_workshops/2023_maxent_course_cbc/./data/gps/spatial_thin/gps_thinned_senecio_madagascariensis_thin1.csv
