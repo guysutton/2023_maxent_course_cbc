@@ -9,3 +9,5 @@ To use this repo:
 2. Click on the green `Code` button, and then `Download ZIP`. This will download the entire repository into a .zip file on your PC. You can then extract the files from the .zip file and open the `.Rproj` file in a new `R` session. 
 
 Please contact me (Dr. Guy F. Sutton) at g.sutton@ru.ac.za, if you have queries or suggestions. 
+
+![](https://github.com/guysutton/2023_maxent_course_cbc/blob/main/models/optimal_model_senecio_madagascariensis/maxent_prediction.png)

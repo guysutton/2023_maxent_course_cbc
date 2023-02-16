@@ -140,7 +140,7 @@ terra::crs(pred_climate, describe = T)
 # For example, we can download quantitative or qualitative data for 
 # other topographical variables
 
-# # Create a directory to store climate data
+# # Create a directory to store topographical data
 dir.create("./data/topographical_layers/current",
            recursive = TRUE)
 
