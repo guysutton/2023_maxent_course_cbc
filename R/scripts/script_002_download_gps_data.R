@@ -174,7 +174,7 @@ ggplot() +
 # -----------------------------------------------------------------------------
 
 # We have GPS records for S. madagascariensis on a global scale.
-# - However, in this study, we want to use on the native-range GPS points 
+# - However, in this study, we want to use the native-range GPS points 
 #   (South Africa and Madagascar) to build an SDM and predict where 
 #   the plant could become invasive elsewhere in the world 
 
